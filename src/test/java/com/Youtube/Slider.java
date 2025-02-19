@@ -7,6 +7,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -20,13 +21,13 @@ public class Slider {
 	
 	@BeforeSuite
 	public void launch() {
-		//ChromeOptions options = new ChromeOptions();
-		// options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.6943.127 Safari/537.36");
+		ChromeOptions options = new ChromeOptions();
+		 options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.6943.127 Safari/537.36");
 		
 		
-		driver=new ChromeDriver();
+		driver=new ChromeDriver(options);
 		 wait = new WebDriverWait(driver, Duration.ofSeconds(60));
-        driver.get("https://www.youtube.com/watch?v=KUN5Uf9mObQ&list=RDKUN5Uf9mObQ&index=1");
+        driver.get("https://www.youtube.com/watch?v=KUN5Uf9mObQ");
         driver.manage().window().maximize();
 	}
 	
@@ -41,28 +42,35 @@ public class Slider {
 		 pplayMe.click();
 		 	
 		
-			try {
+		 try {
 				WebElement button = driver.findElement(By.id("skip-button:2"));
 				wait.until(ExpectedConditions.elementToBeClickable(button));
 				
 				if(button.isDisplayed()) {
 					button.click();
 					System.out.println(driver.findElement(By.xpath("//ytd-menu-renderer[@class='style-scope ytd-watch-metadata']//ytd-download-button-renderer[@class='style-scope ytd-menu-renderer']//div[@class='yt-spec-touch-feedback-shape__fill']")).getLocation());
+					System.out.println("Skip clicked");
 				}
 			} catch (NoSuchElementException e) {
-				// TODO: handle exception
+				System.out.println("Skip ad not available");
+				
 			}
 			
 		
 		
 			
-			WebElement noThanks = driver.findElement(By.xpath("//*[@id=\"dismiss-button\"]/yt-button-shape/button/yt-touch-feedback-shape/div"));
-			
-			if(noThanks.isDisplayed()) {
-				noThanks.click();
-				WebElement nothanks2 = driver.findElement(By.className("yt-spec-touch-feedback-shape yt-spec-touch-feedback-shape--touch-response"));
-				wait.until(ExpectedConditions.elementToBeClickable(nothanks2));
-				nothanks2.click();
+			try {
+				WebElement noThanks = driver.findElement(By.xpath("//*[@id=\"dismiss-button\"]/yt-button-shape/button/yt-touch-feedback-shape/div"));
+				
+				if(noThanks.isDisplayed()) {
+					noThanks.click();
+					WebElement nothanks2 = driver.findElement(By.className("yt-spec-touch-feedback-shape yt-spec-touch-feedback-shape--touch-response"));
+					wait.until(ExpectedConditions.elementToBeClickable(nothanks2));
+					nothanks2.click();
+				}
+			} catch (NoSuchElementException e) {
+				System.out.println("No thanks butoon not available.");
+				
 			}
 			
 		
@@ -72,7 +80,7 @@ public class Slider {
 			
 	}
 	
-	@Test(priority = 2)
+	@Test(dependsOnMethods = {"skipAdd"})
 	public void slider() throws InterruptedException {
 		
 		WebElement point = driver.findElement(By.className("ytp-scrubber-container"));
